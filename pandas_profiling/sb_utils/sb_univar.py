@@ -24,6 +24,16 @@ from matplotlib import pyplot as plt
 from IPython.core.debugger import Tracer
 
 
+def cart_auc(x, y):
+    if pd.core.common.is_numeric_dtype(x) == False:
+        x2 = pd.get_dummies(x, dummy_na=True)
+    else:
+        x2 = x.fillna(min(x)-100).values.reshape(-1, 1)
+        
+    t = tree(criterion='gini', splitter='best', max_depth=4, min_samples_split=15, min_samples_leaf=10)
+    cv = cross_val_score(t, x2, y, scoring='roc_auc', n_jobs=3, verbose=0)
+    return np.mean(cv)
+
 def sb_cutz(x, bins=10):
     return pd.cut(x.rank(method='min', pct=True), bins=np.linspace(0, 1, bins + 1))
 
@@ -46,7 +56,7 @@ def plot_confusion_matrix(cm, y, title='Univariate Confusion Matrix', cmap=plt.c
 
 
 def mdl_1d(x, y):
-    """builds univariate model to calculate AUC"""
+    """builds univariate model to calculate AUC
     lr = LogisticRegressionCV(scoring='roc_auc')
     lars = LassoLarsIC(criterion='aic')
 
@@ -71,9 +81,11 @@ def mdl_1d(x, y):
     #    Tracer()()
 
     aucz = roc_auc_score(y, preds)
+    """
+
+    aucz = cart_auc(x,y)
 
     ns = num_bin_stats(x, y)
-
     nplot = plot_num(ns)
     #plot = plot_confusion_matrix(cm, y)
 
@@ -304,7 +316,7 @@ def plot_cat(series, y, title="Categorical Plot", maxn=10):
 
 
 def mdl_1d_cat(x, y):
-    """builds univariate model to calculate AUC"""
+    """builds univariate model to calculate AUC
     if x.nunique() > 10 and com.is_numeric_dtype(x):
         x = sb_cutz(x)
 
@@ -319,13 +331,16 @@ def mdl_1d_cat(x, y):
     except ValueError:
         Tracer()()
 
+    """
+
     plot = plot_cat(x, y)
 
     imgdata = BytesIO()
     plot.savefig(imgdata)
     imgdata.seek(0)
 
-    aucz = roc_auc_score(y, preds)
+    #aucz = roc_auc_score(y, preds)
+    aucz = cart_auc(x,y)
     cmatrix = 'data:image/png;base64,' + \
         quote(base64.b64encode(imgdata.getvalue()))
     plt.close()
