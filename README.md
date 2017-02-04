@@ -1,4 +1,11 @@
 # pandas-profiling
+
+### NOTE: This version has been modified for use with binary classification problems.  Additional functionality includes:
+* **AUC Relevance Ranking**: univariate AUC metrics are calculated for each input and used to sort the order that variables are presented
+* **Categorical Plots**: plots target rates for top value categories (by category size)
+* **Numeric Plots**: runs a binning algorithm on numeric inputs and plots target by bins, on both bin and original scales
+
+
 Generates profile reports from a pandas DataFrame. The *df.describe()* function is great but a little basic for serious exploratory data analysis.
 
 For each column the following statistics - if relevant for the column type - are presented in an interactive HTML report:
@@ -8,7 +15,6 @@ For each column the following statistics - if relevant for the column type - are
 * **Descriptive statistics** like mean, mode, standard deviation, sum, median absolute deviation, coefficient of variation, kurtosis, skewness
 * **Most frequent values**
 * **Histogram**
-
 
 ## Demo
 
